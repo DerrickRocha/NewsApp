@@ -4,25 +4,28 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newsapp.NewsAppDependencies
 import com.example.newsapp.models.NewsSource
 import com.example.newsapp.models.PoliticalBias
 import com.example.newsapp.repositories.NewsSourceRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val repository: NewsSourceRepository
+    private val repository: NewsSourceRepository = NewsAppDependencies.newsSourceRepository,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ): ViewModel() {
 
     private val biases = PoliticalBias.values()
     private val _sources = MutableLiveData<List<NewsSource>>()
 
     fun loadNewsSources(index: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (index >= biases.size) {
-                Log.e("Index out of bounds", "Index exceeds bias list")
-                return@launch
-            }
+        if (index >= biases.size) {
+            Log.e("Index out of bounds", "Index exceeds bias list")
+            return
+        }
+        viewModelScope.launch(dispatcher) {
             _sources.value = repository.getNewsSources(biases[index])
         }
     }
