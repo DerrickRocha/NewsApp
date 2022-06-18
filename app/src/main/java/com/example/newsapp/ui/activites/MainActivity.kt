@@ -1,4 +1,4 @@
-package com.example.newsapp
+package com.example.newsapp.ui.activites
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,6 +10,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.newsapp.models.NewsSource
+import com.example.newsapp.ui.composables.HomeScreen
 import com.example.newsapp.ui.theme.NewsAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,13 +19,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             NewsAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
-                }
+                HomeScreen(emptyList())
             }
         }
     }
@@ -38,6 +34,6 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     NewsAppTheme {
-        Greeting("Android")
+        HomeScreen(listOf(NewsSource.CBS))
     }
 }
