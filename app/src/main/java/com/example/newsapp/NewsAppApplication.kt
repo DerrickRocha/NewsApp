@@ -6,6 +6,6 @@ class NewsAppApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        NewsAppDependencies.initialize()
+        NewsAppDependencies.initialize(this)
     }
 }

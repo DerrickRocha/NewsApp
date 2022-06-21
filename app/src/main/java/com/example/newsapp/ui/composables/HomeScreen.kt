@@ -7,26 +7,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
 import com.example.newsapp.models.NewsSource
-import com.example.newsapp.ui.theme.NewsAppTheme
+import com.example.newsapp.ui.viewmodels.HomeViewModel
 
 @Composable
-fun HomeScreen(sources: List<NewsSource>) {
+fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
     Column {
         HomeScreenAppBar()
-        HomeScreenNewsSources(sources)
+        HomeScreenNewsSources(viewModel, navController)
         HomeScreenSlider()
     }
 
@@ -40,23 +43,33 @@ fun HomeScreenAppBar() {
 }
 
 @Composable
-fun HomeScreenNewsSources(sources: List<NewsSource>) {
+fun HomeScreenNewsSources(viewModel: HomeViewModel, navController: NavController) {
+    val sources by viewModel.sources.observeAsState()
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(sources) { source ->
-            NewsSourceCard(source)
+        sources?.let {
+            items(it) { source ->
+                NewsSourceCard(source) {
+                    navController.navigate(
+                        Screen.NewsSourceScreen.route + "?rssUrl=${source.rssUrl}&imageUrl=${source.imageUrl}"
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-fun NewsSourceCard(source: NewsSource) {
-    Row{
-        Image(
-            painterResource(id = R.drawable.ic_launcher_background),
+fun NewsSourceCard(source: NewsSource, onClick:() -> Unit) {
+    Row(modifier = Modifier.selectable(
+        selected = true,
+        onClick = onClick
+    )
+    ){
+        AsyncImage(
+            model = source.imageUrl,
             contentDescription = null,
             modifier = Modifier
                 .size(40.dp)
-                .clip(CircleShape)
         )
         Text(text = source.name)
     }
@@ -65,12 +78,4 @@ fun NewsSourceCard(source: NewsSource) {
 @Composable
 fun HomeScreenSlider() {
 
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    NewsAppTheme {
-        HomeScreen(listOf(NewsSource.AL_JAZEERA))
-    }
 }
