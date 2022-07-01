@@ -4,20 +4,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.newsapp.R
 import com.example.newsapp.ui.viewmodels.NewsSourceScreenViewModel
@@ -27,26 +26,36 @@ import com.prof.rssparser.Article
 fun NewsSourceScreen(
     rssUrl: String,
     imageUrl: String,
-    newsSourceViewModel: NewsSourceScreenViewModel = viewModel()
+    navController: NavController,
+    newsSourceViewModel: NewsSourceScreenViewModel = viewModel(),
+    onNewsSourceClick: (String) -> Unit
 ) {
     Scaffold(
-        topBar = { NewsSourceScreenAppBar() },
+        topBar = { NewsSourceScreenAppBar(navController) },
         content = {
             LaunchedEffect(key1 = true) {
                 newsSourceViewModel.loadRss(rssUrl)
             }
             Column {
                 NewsSourceScreenImage(imageUrl)
-                NewsSourceScreenContent(newsSourceViewModel)
+                NewsSourceScreenContent(newsSourceViewModel, onNewsSourceClick)
             }
         }
     )
 }
 
 @Composable
-fun NewsSourceScreenAppBar() {
+fun NewsSourceScreenAppBar(navController: NavController) {
     TopAppBar(
-        title = { Text(stringResource(id = R.string.app_name)) }
+        title = { Text(stringResource(id = R.string.app_name)) },
+        navigationIcon = {
+            IconButton(onClick = { navController.navigateUp() }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        }
     )
 }
 
@@ -64,13 +73,15 @@ fun NewsSourceScreenImage(imageUrl: String) {
 }
 
 @Composable
-fun NewsSourceScreenContent(viewModel: NewsSourceScreenViewModel) {
+fun NewsSourceScreenContent(viewModel: NewsSourceScreenViewModel, onNewsSourceClick: (String) -> Unit) {
     val channel by viewModel.channel.observeAsState()
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         channel?.articles?.let {
             items(it) { article ->
                 NewsArticleCard(article) {
-                    //todo: Open web browser or webView.
+                    article.link?.let { articleUrl ->
+                        onNewsSourceClick(articleUrl)
+                    }
                 }
             }
         }
@@ -89,8 +100,7 @@ fun NewsArticleCard(article: Article, onClick: () -> Unit) {
             model = article.image,
             contentDescription = null,
             modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
+                .size(56.dp)
         )
         Text(text = article.title?: "")
     }

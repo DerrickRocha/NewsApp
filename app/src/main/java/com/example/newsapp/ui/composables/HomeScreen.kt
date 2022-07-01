@@ -1,22 +1,13 @@
 package com.example.newsapp.ui.composables
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -24,13 +15,14 @@ import coil.compose.AsyncImage
 import com.example.newsapp.R
 import com.example.newsapp.models.NewsSource
 import com.example.newsapp.ui.viewmodels.HomeViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
     Column {
         HomeScreenAppBar()
         HomeScreenNewsSources(viewModel, navController)
-        HomeScreenSlider()
+        HomeScreenSlider(viewModel)
     }
 
 }
@@ -45,7 +37,7 @@ fun HomeScreenAppBar() {
 @Composable
 fun HomeScreenNewsSources(viewModel: HomeViewModel, navController: NavController) {
     val sources by viewModel.sources.observeAsState()
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
         sources?.let {
             items(it) { source ->
                 NewsSourceCard(source) {
@@ -76,6 +68,20 @@ fun NewsSourceCard(source: NewsSource, onClick:() -> Unit) {
 }
 
 @Composable
-fun HomeScreenSlider() {
+fun HomeScreenSlider(viewModel: HomeViewModel) {
+    var sliderPosition by remember { mutableStateOf(0f) }
 
+    Slider(
+        value = sliderPosition,
+        onValueChange = { sliderPosition = it },
+        valueRange = 0f..4f,
+        onValueChangeFinished = {
+            viewModel.loadNewsSources(sliderPosition.roundToInt())
+        },
+        steps = 3,
+        colors = SliderDefaults.colors(
+            thumbColor = MaterialTheme.colors.secondary,
+            activeTrackColor = MaterialTheme.colors.secondary
+        )
+    )
 }

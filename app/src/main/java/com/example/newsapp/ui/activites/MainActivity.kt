@@ -1,5 +1,7 @@
 package com.example.newsapp.ui.activites
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -67,7 +69,12 @@ class MainActivity : ComponentActivity() {
                 ) { currentBackstackEntry ->
                     val rssUrl = currentBackstackEntry.arguments?.getString("rssUrl")?: ""
                     val imageUrl = currentBackstackEntry.arguments?.getString("imageUrl")?: ""
-                    NewsSourceScreen(rssUrl, imageUrl, viewModel())
+                    NewsSourceScreen(rssUrl, imageUrl, navController, viewModel()) { articleUrl ->
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.data = Uri.parse(articleUrl)
+                        startActivity(intent)
+                    }
+
                 }
             }
 
@@ -83,7 +90,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun DefaultPreview() {
         NewsAppTheme {
-            //HomeScreen(viewModel)
+            //HomeScreen(viewModel,)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.newsapp.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,7 +22,11 @@ class NewsSourceScreenViewModel(
 
     fun loadRss(url: String) {
         viewModelScope.launch(dispatcher) {
-            _channel.postValue(retriever.getFeed(url))
+            try {
+                _channel.postValue(retriever.getFeed(url))
+            } catch (exception: Exception) {
+                Log.e("getFeed()", exception.toString())
+            }
         }
     }
 }
