@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class NewsSourceScreenViewModel(
     private val retriever: RssRetriever = NewsAppDependencies.retriever,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : ViewModel() {
 
     val channel: LiveData<Channel> get() = _channel
@@ -23,7 +23,7 @@ class NewsSourceScreenViewModel(
     fun loadRss(url: String) {
         viewModelScope.launch(dispatcher) {
             try {
-                _channel.postValue(retriever.getFeed(url))
+                _channel.value = retriever.getFeed(url)
             } catch (exception: Exception) {
                 Log.e("getFeed()", exception.toString())
             }

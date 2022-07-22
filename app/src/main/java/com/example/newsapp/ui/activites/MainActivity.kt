@@ -10,8 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -19,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.newsapp.models.NewsSource
 import com.example.newsapp.ui.composables.HomeScreen
 import com.example.newsapp.ui.composables.NewsSourceScreen
 import com.example.newsapp.ui.composables.Screen
@@ -42,7 +47,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainScreen(
         viewModel: HomeViewModel,
-        navController: NavHostController
+        navController: NavHostController,
     ) {
         Surface(
             modifier = Modifier
@@ -74,23 +79,8 @@ class MainActivity : ComponentActivity() {
                         intent.data = Uri.parse(articleUrl)
                         startActivity(intent)
                     }
-
                 }
             }
-
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.loadNewsSources(0)
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun DefaultPreview() {
-        NewsAppTheme {
-            //HomeScreen(viewModel,)
         }
     }
 }
