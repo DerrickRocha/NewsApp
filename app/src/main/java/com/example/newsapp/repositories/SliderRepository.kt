@@ -25,7 +25,7 @@ class RealSliderRepository(
     override fun saveSliderPosition(sliderPosition: Int) {
         with(preferences.edit()) {
             putInt(SLIDER_POSITION_KEY, sliderPosition)
-            commit()
+            apply()
         }
     }
 
